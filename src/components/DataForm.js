@@ -18,7 +18,7 @@ const DataForm = ({ onDataSave }) => {
         }
 
         try {
-            const apiUrl = process.env.REACT_APP_API_URL;
+            const apiUrl = process.env.REACT_APP_API_URL+'api/data';
             console.log('Sending request to:', apiUrl);
             console.log('Sending data:', { data: inputData });
             
