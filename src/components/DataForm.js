@@ -23,7 +23,7 @@ const DataForm = ({ onDataSave }) => {
             console.log('Sending request to:', apiUrl);
             console.log('Sending data:', { data: inputData });
             
-            const response = await axios.post(apiUrl+'api/data', { data: inputData.trim() });
+            const response = await axios.post('api/data', { data: inputData.trim() });
 
             console.log('Response from server:', response.data);
             setInputData('');
@@ -42,7 +42,7 @@ const DataForm = ({ onDataSave }) => {
             const apiUrl = process.env.REACT_APP_API_URL;
             console.log('Fetching data from:', apiUrl);
             
-            const response = await axios.get(apiUrl+'api/data');
+            const response = await axios.get('api/data');
             
             console.log('Data fetched:', response.data);
             setSavedData(response.data);
