@@ -1,5 +1,6 @@
 // filepath: /c:/Users/shaik/OneDrive/Desktop/testingSimplePage(NoorSir)/my-react-app/frontend/src/components/DataForm.js
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const DataForm = ({ onDataSave }) => {
     const [inputData, setInputData] = useState('');
@@ -18,34 +19,21 @@ const DataForm = ({ onDataSave }) => {
         }
 
         try {
-            const apiUrl = process.env.REACT_APP_API_URL+'api/data';
+            const apiUrl = process.env.REACT_APP_API_URL;
             console.log('Sending request to:', apiUrl);
             console.log('Sending data:', { data: inputData });
             
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ data: inputData.trim() })
-            });
+            const response = await axios.post(apiUrl+'api/data', { data: inputData.trim() });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            console.log('Response from server:', result);
+            console.log('Response from server:', response.data);
             setInputData('');
             setError('');
-            onDataSave(result.data);
+            onDataSave(response.data.data);
             // Refresh the data list after saving
             fetchData();
         } catch (error) {
             console.error('Error saving data:', error);
-            setError(`Failed to save data: ${error.message}`);
+            setError(`Failed to save data: ${error.response?.data?.message || error.message}`);
         }
     };
 
@@ -54,23 +42,13 @@ const DataForm = ({ onDataSave }) => {
             const apiUrl = process.env.REACT_APP_API_URL;
             console.log('Fetching data from:', apiUrl);
             
-            const response = await fetch(apiUrl, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
+            const response = await axios.get(apiUrl+'api/data');
             
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            console.log('Data fetched:', result);
-            setSavedData(result);
+            console.log('Data fetched:', response.data);
+            setSavedData(response.data);
         } catch (error) {
             console.error('Error fetching data:', error);
-            setError(`Failed to fetch data: ${error.message}`);
+            setError(`Failed to fetch data: ${error.response?.data?.message || error.message}`);
         }
     };
 
