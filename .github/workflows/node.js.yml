@@ -6,26 +6,33 @@ name: Node.js CI
 on:
   push:
     branches: [ "main" ]
-  
 
 jobs:
   build:
-
     runs-on: self-hosted
 
     strategy:
       matrix:
         node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm run build
+      - name: Clean workspace
+        run: |
+          sudo rm -rf /home/ubuntu/frontend-runner/workspace/frontend_demo/frontend_demo || true
+          sudo mkdir -p /home/ubuntu/frontend-runner/workspace/frontend_demo/frontend_demo
+          sudo chown -R ubuntu:ubuntu /home/ubuntu/frontend-runner/workspace/frontend_demo
+          sudo chmod -R 755 /home/ubuntu/frontend-runner/workspace/frontend_demo
+
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - run: npm install
+      - run: npm run build --if-present
+      - run: npm run build
+
     
