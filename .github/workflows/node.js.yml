@@ -30,7 +30,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm run build
-       
 
-    
+      - run: npm install
+        env:
+          CI: false  # This prevents npm from running in CI mode, which can skip optional dependencies
+
+      - name: Verify react-scripts installation
+        run: |
+          if ! [ -x "$(command -v react-scripts)" ]; then
+            echo "react-scripts is not installed. Installing it now..."
+            npm install react-scripts --save
+          fi
+
+      - run: npm run build
