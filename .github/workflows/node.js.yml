@@ -31,7 +31,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - run: npm install
         env:
           CI: false  # This prevents npm from running in CI mode, which can skip optional dependencies
 
