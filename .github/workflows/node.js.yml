@@ -23,14 +23,14 @@ jobs:
 
     - name: Install dependencies and build React app
       run: |
-        cd /home/ubuntu/frontend/workspace/frontend_deploy  # Adjust the path to your project
+        cd /home/ubuntu/frontend/workspace/frontend_deploy/frontend_deploy  # Adjust the path to your project
         npm install
         npm run build
 
     - name: Deploy build to Nginx
       run: |
         sudo rm -rf /var/www/html/*
-        sudo cp -r /home/ubuntu/frontend/workspace/frontend_deploy/build/* /var/www/html/
+        sudo cp -r /home/ubuntu/frontend/workspace/frontend_deploy/frontend_deploy/build/* /var/www/html/
         sudo systemctl restart nginx
 
     - name: Start frontend with PM2
