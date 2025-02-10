@@ -22,7 +22,7 @@ jobs:
         node-version: '22'
 
     - name: Install dependencies and build frontend
-      working-directory: ./frontend
+      working-directory: ./home/ubuntu/frontend/workspace/frontend_deploy/frontend_deploy/
       run: |
         npm install
         npm run build
@@ -30,7 +30,7 @@ jobs:
     - name: Deploy build to Nginx
       run: |
         sudo rm -rf /var/www/html/*
-        sudo cp -r ./frontend/build/* /var/www/html/
+        sudo cp -r ./home/ubuntu/frontend/workspace/frontend_deploy/frontend_deploy/build* /var/www/html/
         sudo systemctl restart nginx
 
     - name: Start PM2 process (Frontend)
