@@ -1,44 +1,39 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Node.js CI
+name: Deploy React Frontend with PM2
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
-    runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [18.x]
+  deploy:
+    runs-on: self-hosted  # Use the self-hosted runner on AWS EC2
 
     steps:
-      - name: Clean workspace
-        run: |
-          sudo rm -rf /home/ubuntu/frontend-runner/workspace/frontend_demo/frontend_demo || true
-          sudo mkdir -p /home/ubuntu/frontend-runner/workspace/frontend_demo/frontend_demo
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/frontend-runner/workspace/frontend_demo
-          sudo chmod -R 755 /home/ubuntu/frontend-runner/workspace/frontend_demo
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - uses: actions/checkout@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+    - name: Install dependencies and build frontend
+      working-directory: ./frontend
+      run: |
+        npm install
+        npm run build
 
-        env:
-          CI: false  # This prevents npm from running in CI mode, which can skip optional dependencies
+    - name: Deploy build to Nginx
+      run: |
+        sudo rm -rf /var/www/html/*
+        sudo cp -r ./frontend/build/* /var/www/html/
+        sudo systemctl restart nginx
 
-      - name: Verify react-scripts installation
-        run: |
-          if ! [ -x "$(command -v react-scripts)" ]; then
-            echo "react-scripts is not installed. Installing it now..."
-            npm install react-scripts --save
-          fi
-
-      - run: npm run build
+    - name: Start PM2 process (Frontend)
+      run: |
+        pm2 start "serve -s /var/www/html -l 3000" --name frontend
+        pm2 save
